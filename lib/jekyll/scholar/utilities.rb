@@ -95,6 +95,14 @@ module Jekyll
             @style = style
           end
 
+          opts.on('--sort_by SORT_BY') do |sort_by|
+            @sort_key_args = sort_by
+          end
+
+          opts.on('--order ORDER') do |order|
+            @sort_order_args = order
+          end
+
           opts.on('-g', '--group_by GROUP') do |group_by|
             @group_by = group_by
           end
@@ -253,8 +261,8 @@ module Jekyll
 
       def sort_keys
         return @sort_keys unless @sort_keys.nil?
-
-        @sort_keys = Array(config['sort_by'])
+        
+        @sort_keys = Array(interpolate(@sort_key_args) || config['sort_by'])
           .map { |key| key.to_s.split(/\s*,\s*/) }
           .flatten
           .map { |key| key == 'month' ? 'month_numeric' : key }
@@ -263,7 +271,7 @@ module Jekyll
       def sort_order
         return @sort_order unless @sort_order.nil?
 
-        @sort_order = Array(config['order'])
+        @sort_order = Array(interpolate(@sort_order_args) || config['order'])
           .map { |key| key.to_s.split(/\s*,\s*/) }
           .flatten
       end
