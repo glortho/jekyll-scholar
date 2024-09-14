@@ -47,7 +47,7 @@ module Jekyll
 
           opts.on('-r', '--remove_duplicates [MATCH_FIELDS]') do |match_field|
             @remove_duplicates = true
-            @match_fields = match_field.split(/,\s+/) if not match_field.nil? 
+            @match_fields = match_field.split(/,\s+/) if not match_field.nil?
           end
 
           opts.on('-A', '--suppress_author') do |cited|
@@ -120,7 +120,7 @@ module Jekyll
           end
         end
 
-        argv = arguments.split(/(\B-[cCfhqptTsgGOlLomAr]|\B--(?:cited(_in_order)?|clear|bibliography_list_tag|file|query|prefix|text|style|group_(?:by|order)|type_order|template|locator|label|offset|max|suppress_author|remove_duplicates|))/)
+        argv = arguments.split(/(\B-[cCfhqptTsgGOlLomAr]|\B--(?:cited(_in_order)?|clear|bibliography_list_tag|file|query|prefix|text|style|group_(?:by|order)|type_order|template|locator|label|offset|max|suppress_author|remove_duplicates|order|sort_by))/)
 
         parser.parse argv.map(&:strip).reject(&:empty?)
       end
@@ -261,7 +261,7 @@ module Jekyll
 
       def sort_keys
         return @sort_keys unless @sort_keys.nil?
-        
+
         @sort_keys = Array(interpolate(@sort_key_args) || config['sort_by'])
           .map { |key| key.to_s.split(/\s*,\s*/) }
           .flatten
@@ -397,7 +397,7 @@ module Jekyll
 
       def remove_duplicates?
         @remove_duplicates || config['remove_duplicates']
-      end 
+      end
 
       def suppress_author?
         !!@suppress_author
@@ -455,7 +455,7 @@ module Jekyll
       end
 
       def skip_sort?
-        @skip_sort || config['sort_by'] == 'none'
+        @skip_sort
       end
 
       def extend_path(name)
@@ -471,7 +471,7 @@ module Jekyll
         name << '.bib' if File.extname(name).empty? && !File.exist?(name)
         name
       end
-
+#
       def scholar_source
         source = config['source']
 
@@ -605,7 +605,7 @@ module Jekyll
           return false
         end
         return true
-      end 
+      end
 #
       def generate_details?
         site.layouts.key?(File.basename(config['details_layout'], '.html'))
@@ -639,7 +639,7 @@ module Jekyll
 
         # First generate placeholders for all items in the bibtex entry
         url_placeholders = {}
-        entry.fields.each_pair do |k, v| 
+        entry.fields.each_pair do |k, v|
           value = v.to_s.dup
           value = Jekyll::Utils::slugify(value, :mode => 'pretty') unless k == :doi
           url_placeholders[k] = value
